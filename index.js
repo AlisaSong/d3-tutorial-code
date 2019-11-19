@@ -13,6 +13,10 @@ d3.json("data.json").then((data) => {
     .domain([0, d3.max(data.nodes.map(node => node.influence))])
     .range([8, 20]);
 
+  const fontSizeScale = d3.scaleLinear()
+  .domain([0, d3.max(data.nodes.map(node => node.influence))])
+  .range([7, 12])
+
   const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
   const simulation = d3.forceSimulation(data.nodes)
@@ -21,7 +25,7 @@ d3.json("data.json").then((data) => {
       .id(d => d.id)
       .distance(75))
     .force("center", d3.forceCenter(300, 300))
-    .force("gravity", d3.forceManyBody().strength(30));
+    .force("gravity", d3.forceManyBody().strength(7.5));
 
   const svg = d3.select("#Target");
 
@@ -53,8 +57,29 @@ d3.json("data.json").then((data) => {
     .attr("stroke-width", 0.5)
     .style("fill", (d) => colorScale(d.zone));
 
+  const textContainer = svg
+  .selectAll("g.label")
+  .data(data.nodes)
+  .enter()
+  .append("g");
+
+  textContainer
+  .append("text")
+  .text((d) => d.name)
+  .attr("font-size", (d) => fontSizeScale(d.influence))
+  .attr("transform", (d) => {
+    const scale = nodeScale(d.influence);
+    const x = scale + 2;
+    const y = scale + 4;
+    return `translate(${x}, ${y})`;
+  })
+
   const lineGenerator = d3.line();
+
   simulation.on("tick", () => {
+    textContainer
+    .attr("transform", (d) => `translate(${d.x}, ${d.y})`);
+
     node
       .attr("cx", (d) => d.x)
       .attr("cy", (d) => d.y);
