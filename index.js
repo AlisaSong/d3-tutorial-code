@@ -4,6 +4,11 @@ d3.json("data.json").then((data) => {
     .domain([0, d3.max(data.links.map(link => link.weight))])
     .range([0.5, 3]);
 
+  const linkDashScale = d3
+    .scaleOrdinal()
+    .domain([0, 2, 3])
+    .range(["4 2", "2 2", null]);
+
   const simulation = d3.forceSimulation(data.nodes)
     .force("charge", d3.forceManyBody().strength(-100))
     .force("link", d3.forceLink(data.links)
@@ -20,6 +25,7 @@ d3.json("data.json").then((data) => {
     .append("path")
     .attr("stroke", "black")
     .attr("stroke-width", (d) => linkWidthScale(d.weight))
+    .attr("stroke-dasharray", (d) => linkDashScale(d.weight))
     .attr("fill", "none");
 
   const node = svg
