@@ -10,7 +10,7 @@ d3.json("data.json").then((data) => {
     .range(["4 2", "2 2", null]);
 
   const simulation = d3.forceSimulation(data.nodes)
-    .force("charge", d3.forceManyBody().strength(-100))
+    .force("charge", d3.forceManyBody().strength(-75))
     .force("link", d3.forceLink(data.links)
       .id(d => d.id)
       .distance(75))
