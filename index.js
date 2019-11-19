@@ -26,7 +26,15 @@ d3.json("data.json").then((data) => {
     .attr("stroke", "black")
     .attr("stroke-width", (d) => linkWidthScale(d.weight))
     .attr("stroke-dasharray", (d) => linkDashScale(d.weight))
-    .attr("fill", "none");
+    .attr("fill", "none")
+    .attr("marker-mid", (d) => {
+      switch(d.type) {
+        case "SUPERVISORY":
+          return "url(#markerArrow)"
+        default:
+          return "none";
+      }
+    });
 
   const node = svg
     .selectAll("circle")
@@ -45,8 +53,13 @@ d3.json("data.json").then((data) => {
       .attr("cy", (d) => d.y);
 
     link.attr("d", (d) => {
+      const mid = [
+        (d.source.x + d.target.x)/2,
+        (d.source.y + d.target.y)/2
+      ];
       return lineGenerator([
         [d.source.x, d.source.y],
+        mid,
         [d.target.x, d.target.y]
       ]);
     });

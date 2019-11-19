@@ -6,12 +6,19 @@
       border: 1px solid red;
     }
   </style>
-  </head>
+</head>
 
 <body>
-<h2>Hello, World!</h2>
-<svg id="Target"></svg>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.7/d3.js" integrity="sha256-trEbEQOrst1KvCE63coHz4jmv22at62gNbY/5W7pu08=" crossorigin="anonymous"></script>
-<script src="index.js"></script>
+  <h2>Hello, World!</h2>
+  <svg id="Target">
+      <defs>
+          <!-- Marker is defined that acts as arrow appearing in the middle of certain lines -->
+          <marker id="markerArrow" markerWidth="7" markerHeight="7" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,4 L4,2 z" fill="rgba(72, 72, 72, 0.35)" />
+          </marker>
+      </defs>
+  </svg>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.7/d3.js" integrity="sha256-trEbEQOrst1KvCE63coHz4jmv22at62gNbY/5W7pu08=" crossorigin="anonymous"></script>
+  <script src="index.js"></script>
 
 </body>
