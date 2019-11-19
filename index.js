@@ -9,6 +9,10 @@ d3.json("data.json").then((data) => {
     .domain([0, 2, 3])
     .range(["4 2", "2 2", null]);
 
+  const nodeScale = d3.scaleLinear()
+    .domain([0, d3.max(data.nodes.map(node => node.influence))])
+    .range([8, 20]);
+
   const simulation = d3.forceSimulation(data.nodes)
     .force("charge", d3.forceManyBody().strength(-75))
     .force("link", d3.forceLink(data.links)
@@ -42,7 +46,7 @@ d3.json("data.json").then((data) => {
     .data(data.nodes)
     .enter()
     .append("circle")
-    .attr("r", 15)
+    .attr("r", (d) => nodeScale(d.influence))
     .attr("stroke", "green")
     .attr("stroke-width", 0.5)
     .style("fill", "blue");
