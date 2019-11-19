@@ -14,8 +14,8 @@ d3.json("data.json").then((data) => {
     .range([8, 20]);
 
   const fontSizeScale = d3.scaleLinear()
-  .domain([0, d3.max(data.nodes.map(node => node.influence))])
-  .range([7, 12])
+    .domain([0, d3.max(data.nodes.map(node => node.influence))])
+    .range([7, 12])
 
   const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -39,7 +39,7 @@ d3.json("data.json").then((data) => {
     .attr("stroke-dasharray", (d) => linkDashScale(d.weight))
     .attr("fill", "none")
     .attr("marker-mid", (d) => {
-      switch(d.type) {
+      switch (d.type) {
         case "SUPERVISORY":
           return "url(#markerArrow)"
         default:
@@ -58,28 +58,75 @@ d3.json("data.json").then((data) => {
     .style("fill", (d) => colorScale(d.zone));
 
   const textContainer = svg
-  .selectAll("g.label")
-  .data(data.nodes)
-  .enter()
-  .append("g");
+    .selectAll("g.label")
+    .data(data.nodes)
+    .enter()
+    .append("g");
 
   textContainer
-  .append("text")
-  .text((d) => d.name)
-  .attr("font-size", (d) => fontSizeScale(d.influence))
-  .attr("transform", (d) => {
-    const scale = nodeScale(d.influence);
-    const x = scale + 2;
-    const y = scale + 4;
-    return `translate(${x}, ${y})`;
-  })
+    .append("text")
+    .text((d) => d.name)
+    .attr("font-size", (d) => fontSizeScale(d.influence))
+    .attr("transform", (d) => {
+      const scale = nodeScale(d.influence);
+      const x = scale + 2;
+      const y = scale + 4;
+      return `translate(${x}, ${y})`;
+    })
+
+  const card = svg
+    .append("g")
+    .attr("pointer-events", "none")
+    .attr("display", "none")
+
+  const cardBackground = card.append("rect")
+    .attr("width", 150)
+    .attr("height", 45)
+    .attr("fill", "#eee")
+    .attr("stroke", "#333")
+    .attr("rx", 4);
+
+  const cardTextName = card
+    .append("text")
+    .attr("transform", "translate(8, 20)")
+    .text("DEFAULT NAME");
+
+  const cardTextRole = card
+    .append("text")
+    .attr("font-size", 10)
+    .attr("transform", "translate(8, 35)")
+    .text("DEFAULT ROLE");
+
+  let currentTarget;
+
+  node.on("mouseover", d => {
+      card.attr("display", "block");
+
+      currentTarget = d3.event.target;
+
+      cardTextName.text(d.name);
+      cardTextRole.text(d.role);
+
+      const nameWidth = cardTextName.node().getBBox().width;
+      const positionWidth = cardTextRole.node().getBBox().width;
+
+      const cardWidth = Math.max(nameWidth, positionWidth);
+
+      cardBackground.attr("width", cardWidth + 16);
+      simulation.alphaTarget(0).restart();
+  });
+
+  node.on("mouseout", () => {
+    currentTarget = null;
+    card.attr("display", "none");
+  });
 
   const lineGenerator = d3.line()
     .curve(d3.curveCardinal);
 
   simulation.on("tick", () => {
     textContainer
-    .attr("transform", (d) => `translate(${d.x}, ${d.y})`);
+      .attr("transform", (d) => `translate(${d.x}, ${d.y})`);
 
     node
       .attr("cx", (d) => d.x)
@@ -87,23 +134,23 @@ d3.json("data.json").then((data) => {
 
     link.attr("d", (d) => {
       const mid = [
-        (d.source.x + d.target.x)/2,
-        (d.source.y + d.target.y)/2
+        (d.source.x + d.target.x) / 2,
+        (d.source.y + d.target.y) / 2
       ];
 
       if (d.overlap > 0) {
-          const distance = Math.sqrt(
-            Math.pow(d.target.x - d.source.x, 2) +
-            Math.pow(d.target.y - d.source.y, 2)
-          );
+        const distance = Math.sqrt(
+          Math.pow(d.target.x - d.source.x, 2) +
+          Math.pow(d.target.y - d.source.y, 2)
+        );
 
-          const slopeX = (d.target.x - d.source.x) / distance;
-          const slopeY = (d.target.y - d.source.y) / distance;
+        const slopeX = (d.target.x - d.source.x) / distance;
+        const slopeY = (d.target.y - d.source.y) / distance;
 
-          const curveSharpness = 8;
+        const curveSharpness = 8;
 
-          mid[0] += slopeY * curveSharpness;
-          mid[1] -= slopeX * curveSharpness;
+        mid[0] += slopeY * curveSharpness;
+        mid[1] -= slopeX * curveSharpness;
       }
 
       return lineGenerator([
@@ -112,5 +159,13 @@ d3.json("data.json").then((data) => {
         [d.target.x, d.target.y]
       ]);
     });
+
+    if(currentTarget) {
+      const radius = currentTarget.r.baseVal.value;
+      const xPos = currentTarget.cx.baseVal.value + radius + 3;
+      const yPos = currentTarget.cy.baseVal.value + radius + 3;
+
+      card.attr("transform", `translate(${xPos}, ${yPos})`);
+    }
   });
 });
