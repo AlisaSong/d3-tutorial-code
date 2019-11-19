@@ -14,7 +14,8 @@ d3.json("data.json").then((data) => {
     .force("link", d3.forceLink(data.links)
       .id(d => d.id)
       .distance(75))
-    .force("center", d3.forceCenter(300, 300));
+    .force("center", d3.forceCenter(300, 300))
+    .force("gravity", d3.forceManyBody().strength(30));
 
   const svg = d3.select("#Target");
 
