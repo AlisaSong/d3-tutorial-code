@@ -1,4 +1,33 @@
 d3.json("data.json").then((data) => {
+  const drag = simulation => {
+    const dragStarted = d => {
+      if(!d3.event.active) {
+        simulation.alphaTarget(0.3).restart();
+      }
+
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    const dragged = d => {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    }
+
+    const dragEnded = d => {
+      if(!d3.event.active) {
+        simulation.alphaTarget(0);
+      }
+
+      d.fx = null;
+      d.fy = null;
+    }
+
+    return d3.drag()
+    .on("start", dragStarted)
+    .on("drag", dragged)
+    .on("end", dragEnded);
+  }
   const linkWidthScale = d3
     .scaleLinear()
     .domain([0, d3.max(data.links.map(link => link.weight))])
@@ -57,6 +86,7 @@ d3.json("data.json").then((data) => {
     .attr("stroke-width", 0.5)
     .style("fill", (d) => colorScale(d.zone));
 
+node.call(drag(simulation));
   const textContainer = svg
     .selectAll("g.label")
     .data(data.nodes)
