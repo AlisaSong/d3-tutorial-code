@@ -74,7 +74,8 @@ d3.json("data.json").then((data) => {
     return `translate(${x}, ${y})`;
   })
 
-  const lineGenerator = d3.line();
+  const lineGenerator = d3.line()
+    .curve(d3.curveCardinal);
 
   simulation.on("tick", () => {
     textContainer
