@@ -58,7 +58,15 @@ d3.json("data.json").then((data) => {
         } else {
           return 50;
         }
-      }))
+      })
+      .strength((d) => {
+        if(d.source.id === 1 || d.target.id === 1) {
+          return 1.15;
+        } else {
+          return 0.1;
+        }
+      })
+    )
     .force("center", d3.forceCenter(300, 300))
     .force("gravity", d3.forceManyBody().strength(7.5));
 
