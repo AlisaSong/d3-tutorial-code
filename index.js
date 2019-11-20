@@ -52,7 +52,13 @@ d3.json("data.json").then((data) => {
     .force("charge", d3.forceManyBody().strength(-75))
     .force("link", d3.forceLink(data.links)
       .id(d => d.id)
-      .distance(75))
+      .distance((d, i) => {
+        if(d.source.id === 0 || d.target.id === 0) {
+          return 75;
+        } else {
+          return 50;
+        }
+      }))
     .force("center", d3.forceCenter(300, 300))
     .force("gravity", d3.forceManyBody().strength(7.5));
 
